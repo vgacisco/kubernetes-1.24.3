@@ -1,0 +1,44 @@
+---
+# tasks file for roles/controller
+#
+#
+#  维护者: vgacisco
+#  version: v1.0
+#  8/10/22
+#
+
+- name: push controller certs to server
+  copy:
+    src: '{{item}}'
+    dest: /etc/kubernetes/pki
+  loop:
+    - files/kubernetes-ca.pem
+    - files/front-proxy-ca.pem
+    - files/sa.key
+
+
+- name: push kubeconfig file to server
+  copy:
+    src: files/kube-controller-manager.kubeconfig
+    dest: /etc/kubernetes
+
+- name: push controller bin to server
+  copy:
+    src: bin/kube-controller-manager
+    dest: /usr/local/bin
+    mode: 0755
+
+- name: push service to controller server
+  copy: 
+    src: kube-controller-manager.service
+    dest: /usr/lib/systemd/system
+  notify: restart kube-controller-manager
+
+- name: start kube-controller-manager
+  systemd:
+    name: kube-controller-manager
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+

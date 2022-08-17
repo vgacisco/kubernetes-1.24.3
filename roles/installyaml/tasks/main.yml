@@ -1,0 +1,27 @@
+---
+# tasks file for roles/installyaml
+#
+#
+
+- name: temp calico-etcd.yaml
+  template:
+    src: files/calico-etcd.yaml.j2
+    dest: /root/calico-etcd.yaml
+
+- name: copy coredns metrics 
+  copy:
+    src: '{{item}}'
+    dest: /root
+  loop:
+    - files/coredns.yaml
+    - files/metrics.yaml
+
+
+- name: kubectl apply
+  shell: |
+    kubectl apply -f ./calico-etcd.yaml
+    kubectl apply -f ./coredns.yaml
+    kubectl apply -f ./metrics.yaml
+  args:
+    chdir: /root
+

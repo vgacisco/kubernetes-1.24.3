@@ -1,0 +1,12 @@
+[Unit]
+Description=nginx
+[Service]
+Type=forking
+ExecStart=/opt/nginx/sbin/nginx
+ExecReload=/opt/nginx/sbin/nginx -s reload
+PrivateTmp=true
+Restart=always
+RestartSec=10
+LimitNOFILE=65535
+[Install]
+WantedBy=multi-user.target

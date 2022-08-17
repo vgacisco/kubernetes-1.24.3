@@ -1,0 +1,3 @@
+- hosts: schedulers
+  roles:
+    - scheduler

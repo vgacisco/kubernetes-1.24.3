@@ -1,0 +1,48 @@
+---
+# tasks file for apiserver
+#
+# 维护者: vgacisco
+#
+# version: v1.0
+# 8/10/22
+#
+
+- name: push certs to server
+  copy:
+    src: '{{item}}'
+    dest: /etc/kubernetes/pki
+  loop:
+    - files/etcd-ca.pem
+    - files/etcd-client.pem
+    - files/etcd-client-key.pem
+    - files/kubernetes-ca.pem
+    - files/kubernetes-ca-key.pem
+    - files/front-proxy-ca.pem
+    - files/front-proxy-client.pem
+    - files/front-proxy-client-key.pem
+    - files/sa.key
+    - files/sa.pub
+    - files/kube-apiserver.pem
+    - files/kube-apiserver-key.pem
+
+
+- name: copy bin file to server
+  copy:
+    src: bin/kube-apiserver
+    dest: /usr/local/bin/kube-apiserver
+    mode: 0755
+
+- name: template service file to server
+  template:
+    src: kube-apiserver.service.j2
+    dest: /usr/lib/systemd/system/kube-apiserver.service
+  notify: restart kube-apiserver
+
+- name: start kube-apiserver
+  systemd:
+    name: kube-apiserver
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+

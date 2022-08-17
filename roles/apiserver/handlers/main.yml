@@ -1,0 +1,8 @@
+---
+# handlers file for apiserver
+#
+- name: restart kube-apiserver
+  systemd:
+    name: kube-apiserver
+    state: restarted
+

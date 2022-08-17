@@ -1,0 +1,27 @@
+- hosts: localhost
+  remote_user: root
+  tasks:
+      # 根据 hosts配置生成 kube-apiserver.json etcd-server.json 证书申请文件。以及主机域名解释文件host.都放到 roles/files里
+  - name: create apiserver-cert etcd-server-cert file
+    template:
+      src: '{{item.src}}'
+      dest: '{{item.dest}}'
+    loop:
+      - { src: kube-apiserver.json.j2, dest: ./roles/files/kube-apiserver.json }
+      - { src: etcd-server.json.j2, dest: ./roles/files/etcd-server.json }
+      - { src: hosts.j2, dest: ./roles/files/hosts }
+      
+        # 运行密钥生成脚本，生成集群使用的 pem kubeconfig 以及 对sa.key 密钥对
+  - name: create config for cluster
+    shell: |
+      bash -c ./make-certs.sh
+    args:
+      chdir: ./roles/files
+
+        # 解压bin文件
+  - name: create bin file 
+    shell: |
+      bash -c ./readiness.sh
+    args:
+      chdir: ./roles/bin
+

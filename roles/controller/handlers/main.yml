@@ -1,0 +1,9 @@
+---
+# handlers file for roles/controller
+#
+- name: restart kube-controller-manager
+  systemd:
+    name: kube-controller-manager
+    state: restarted
+
+

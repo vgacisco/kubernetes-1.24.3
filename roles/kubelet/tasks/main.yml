@@ -1,0 +1,46 @@
+---
+# tasks file for roles/kubelet
+#
+#
+#  维护者: vgacisco
+#
+#  version: v1.0
+#
+#  8/10/22
+#
+- name: push kubelet.conf.yml to server
+  copy:
+    src: '{{item}}'
+    dest: /etc/kubernetes
+  loop:
+    - kubelet.conf.yml
+    - files/bootstrap.kubeconfig
+
+- name: push kubernetes ca pem 
+  copy:
+    src: files/kubernetes-ca.pem
+    dest: /etc/kubernetes/pki
+
+- name: push kubernetes ca pem 
+  copy:
+    src: files/front-proxy-ca.pem
+    dest: /etc/kubernetes/pki
+    
+- name: template kubelet.service
+  template:
+    src: kubelet.service.j2
+    dest: /usr/lib/systemd/system/kubelet.service
+
+- name: push kubelet bin 
+  copy:
+    src: bin/kubelet
+    dest: /usr/local/bin
+    mode: 0755
+
+- name: start kubelet
+  systemd:
+    name: kubelet
+    state: started
+    enabled: yes
+    daemon_reload: yes
+

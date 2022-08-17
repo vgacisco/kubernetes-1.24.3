@@ -1,0 +1,26 @@
+---
+# tasks file for roles/setbootstrap
+#
+#
+#  维护者: vgacisco
+#  
+#  version: v1.0
+#  8/10/22
+#
+- name: push bootstrap-token.yaml
+  copy:
+    src: '{{item}}'
+    dest: /root
+  loop:
+    - files/bootstrap-token.yaml
+    - boot-role-binding.yaml 
+
+- name: set bootstrap
+  shell: |
+    kubectl apply -f ./bootstrap-token.yaml;
+    kubectl apply -f ./boot-role-binding.yaml;
+  args:
+    chdir: /root
+
+
+

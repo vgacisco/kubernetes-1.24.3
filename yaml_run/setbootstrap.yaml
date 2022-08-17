@@ -1,0 +1,4 @@
+- hosts: apiservers
+  roles:
+    - setbootstrap
+  run_once: true

@@ -1,0 +1,32 @@
+---
+# tasks file for roles/nginx
+#
+# 维护者: vgacisco
+# version: v1.0
+# 8/10/22
+#
+- name: mkdir for nginx
+  file:
+    path: /root/nginx
+    state: directory
+
+- name: pash tar file to server
+  copy:
+    src: '{{item}}'
+    dest: /root/nginx
+  with_fileglob:
+    - bin/nginx-*tar.gz
+    - nginx.service
+    - install.sh
+
+- name: template nginx conf to server
+  template:
+    src: nginx.conf.j2
+    dest: /root/nginx/nginx.conf
+
+- name: run install.sh
+  shell: |
+    chmod +x ./install.sh
+    bash -c ./install.sh
+  args:
+    chdir: /root/nginx

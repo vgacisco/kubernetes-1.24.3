@@ -1,0 +1,39 @@
+---
+# tasks file for roles/proxy
+#
+#
+#  维护者: vgacisco
+#
+#  version: v1.0
+#
+#  8/10/22
+#
+#
+- name: push kube-proxy.kubeconfig
+  copy:
+    src: files/kube-proxy.kubeconfig
+    dest: /etc/kubernetes
+
+- name: push kube-proxy.conf.yml.j2
+  template:
+    src: kube-proxy.conf.yml.j2
+    dest: /etc/kubernetes/kube-proxy.conf.yml
+
+- name: push kube-proxy.service 
+  copy:
+    src: kube-proxy.service
+    dest: /usr/lib/systemd/system
+
+- name: push bin 
+  copy:
+    src: bin/kube-proxy
+    dest: /usr/local/bin
+    mode: 0755
+
+- name: start proxy
+  systemd:
+    name: kube-proxy
+    state: started
+    daemon_reload: yes
+    enabled: yes
+

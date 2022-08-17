@@ -1,0 +1,24 @@
+---
+# tasks file for roles/admin
+#
+#
+# 维护者: vgacisco
+# version: v1.0
+# 8/10/22
+#
+- name: mkdir .kube
+  file:
+    path: /root/.kube
+    state: directory
+    recurse: yes
+
+- name: push kconfig file to server
+  copy:
+    src: files/admin.kubeconfig
+    dest: /root/.kube/config
+
+- name: push bin file to server
+  copy:
+    src: bin/kubectl
+    dest: /usr/local/bin
+    mode: 0755

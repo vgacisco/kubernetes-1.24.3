@@ -1,0 +1,137 @@
+---
+# tasks file for roles/system
+# 
+# 这个角色用来配置服务器
+#
+# 维护者: vgacisco
+# version: v1.0
+# 8/10/22
+
+
+- name: close firewalld
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+# 这里更改 fstab文件，直接删除包换 swap 的行
+- name:  set  fstab file to close swap
+  lineinfile:
+    path: /etc/fstab
+    regexp: '[ ]swap[ ]'
+    line: ""
+
+# 上面修改了配置文件，下一次启动才生效，这里直接在命令行送亲 swap,
+- name: close swap in command
+  shell:
+    swapoff -a;
+    setenforce 0;   #这里顺便在命令行关了selinux
+  ignore_errors: yes
+
+# 配置 selinux配置文件，通过 lineinfile 模块更改 SELINUX=disable
+- name: set selinux config
+  lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: SELINUX=disable
+
+# 开启chronyd同步时间，如果设备不能联网，刚需要配置chronyd同步本地时间
+- name: open  chronyd service
+  systemd:
+    name: chronyd
+    state: started
+    enabled: yes
+  ignore_errors: yes
+
+# 
+#  加载模块
+#
+- name: modprobe mode
+  modprobe:
+    name: '{{item}}'
+    state: present
+  loop:
+    - ip_vs
+    - ip_vs_lc
+    - ip_vs_wlc
+    - ip_vs_lblc
+    - ip_vs_lblcr
+    - ip_vs_nq
+    - ip_vs_sed
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
+    - ip_vs_dh
+    - br_netfilter
+    - nf_conntrack
+    - ip_tables
+    - iptable_filter
+
+#
+# 配置 modules 配置文件
+#
+- name: set modules config file
+  lineinfile:
+    create: yes
+    path: /etc/modules-load.d/k8s.conf
+    line: '{{item}}'
+  loop:
+    - ip_vs
+    - ip_vs_lc
+    - ip_vs_wlc
+    - ip_vs_lblc
+    - ip_vs_lblcr
+    - ip_vs_nq
+    - ip_vs_sed
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
+    - ip_vs_dh
+    - br_netfilter
+    - nf_conntrack
+    - ip_tables
+    - iptable_filter
+
+# 配置内核参数
+#
+- name: set sysctl
+  sysctl:
+    name: '{{item}}'
+    value: "1"
+    sysctl_set: yes
+    reload: yes
+  loop:
+    - net.bridge.bridge-nf-call-iptables
+    - net.bridge.bridge-nf-call-ip6tables
+    - net.ipv4.ip_forward
+
+- name: close sysctl 
+  sysctl:
+    name: '{{item}}'
+    value: "0"
+    sysctl_set: yes
+    reload: yes
+  loop:
+    - net.ipv4.conf.all.rp_filter
+    - net.ipv4.conf.default.rp_filter
+    - vm.swappiness
+
+# 配置/etc/hosts文件,这个文件是根据资源清单文件生成，
+#
+- name: copy hosts file to server
+  copy:
+    src: ./files/hosts
+    dest: /etc/hosts
+
+# 这里顺便在每个主机上生成 /etc/kubernetes/pki文件夹，这个文件夹将会用来存放各种证书文件
+#
+- name: create /etc/kubernetes/pki
+  file:
+    path: '/etc/kubernetes/pki'
+    state: directory
+    recurse: yes
+
+- name: set hostname for host #这里配置主机名
+  shell: |
+    hostnamectl set-hostname {{host_name}};
+
+

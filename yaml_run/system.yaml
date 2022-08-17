@@ -1,0 +1,6 @@
+- hosts: all
+  vars:
+    testpath: /etc/modules-load.d/k8s.conf
+  roles:
+    - role: system
+      

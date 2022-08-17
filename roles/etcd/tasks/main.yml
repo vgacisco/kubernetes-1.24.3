@@ -1,0 +1,45 @@
+---
+# tasks file for roles/etcd
+
+ 
+#
+# 维护者: vgacisco
+# version: v1
+# 8/10/22
+#
+
+  # 上传etcd.conf.yml 文件到服务器
+- name: push etcd.conf.yml to server
+  template:
+    src: etcd.conf.yml.j2
+    dest: /etc/kubernetes/etcd.conf.yml
+
+- name: up certs to server
+  copy:
+    src: '{{item}}'
+    dest: /etc/kubernetes/pki
+  loop:
+    - files/etcd-ca.pem
+    - files/etcd-server.pem
+    - files/etcd-server-key.pem
+  notify: restart etcd
+
+  # 上传 etcd.service 到服务器
+- name: copy etcd.service to  server
+  copy:
+    src: ./files/etcd.service
+    dest: /usr/lib/systemd/system
+
+- name: copy etcd bin to server
+  copy:
+    src: ./bin/etcd
+    dest: /usr/local/bin
+    mode: 0755
+
+- name: start  etcd service
+  systemd:
+    name: etcd
+    state: started
+    daemon_reload: yes
+    enabled: yes
+

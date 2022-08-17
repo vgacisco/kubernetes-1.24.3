@@ -1,0 +1,31 @@
+---
+# tasks file for roles/scheduler
+#
+#
+#  维护者: vgacisco
+#  version: v1.0
+#  8/10/22
+#
+- name: push kubeconfig to scheduler server
+  copy:
+    src: files/kube-scheduler.kubeconfig
+    dest: /etc/kubernetes
+
+- name: push kube-scheduler.service to server
+  copy:
+    src: kube-scheduler.service
+    dest: /usr/lib/systemd/system
+
+- name: push bin file to server
+  copy:
+    src: bin/kube-scheduler
+    dest: /usr/local/bin
+    mode: 0755
+
+- name: start kube-scheduler
+  systemd:
+    name: kube-scheduler
+    state: started
+    enabled: yes
+    daemon_reload: yes
+

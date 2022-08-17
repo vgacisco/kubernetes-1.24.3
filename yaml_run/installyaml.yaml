@@ -1,0 +1,4 @@
+- hosts: apiservers
+  roles:
+    - installyaml
+  run_once: yes

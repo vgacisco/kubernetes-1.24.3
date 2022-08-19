@@ -4,13 +4,21 @@
 
 passwd="$1"
 
-for host in `cat hosts |grep k8s |awk '{print $1}' |uniq`
+cat roles/files/hosts |grep -v "localhost" 
+
+IFS_SAVE=$IFS
+IFS=$'\n'
+for host_info in `cat roles/files/hosts |grep -v localhost`
 do
-    hostname=$(cat hosts |grep k8s |awk '{print $2}')
+    
+    ip=$(echo "$host_info" | awk '{print $1}')
+    host=$(echo $host_info | awk '{print $2}')
+
+    ssh-keygen -R $ip
 
   /usr/bin/expect <<EOF
     set timeout 30
-    spawn ssh-copy-id root@${host}
+    spawn ssh-copy-id root@$ip
             expect {
                 "yes/no"  { send "yes\r"; exp_continue }
                 "login:" { send "root\r"; exp_continue }
@@ -18,5 +26,8 @@ do
             }
             expect eof
 EOF
+
+    ssh root@$ip "wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-vault-8.5.2111.repo"
+
 
 done

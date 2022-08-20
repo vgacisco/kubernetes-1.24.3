@@ -166,7 +166,7 @@ function print_usage(){
 
 ############################ auto install ####################
 function auto_install() {
-    for run in system etcd containerd nginx apiserver controller scheduler setbootstrap kubelet proxy installyaml;do
+    for run in system etcd containerd nginx apiserver controller scheduler admin setbootstrap kubelet proxy installyaml;do
         $run
     done
     return 0

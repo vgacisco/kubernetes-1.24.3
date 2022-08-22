@@ -172,6 +172,25 @@ function auto_install() {
     return 0
 }
 
+############################ function lazy ###################
+#
+# 这个是懒人的函数 
+#
+
+function lazy(){
+
+    ansible-playbook ./yaml_run/readiness.yaml
+    
+    if ! sudo virsh list -all |grep $2;then
+        echo base virtual host not fond
+    fi
+
+    ./yaml_run/make_host.sh $2 $3
+    ./yaml_run/expect-host.sh $3
+    return 0
+
+}
+
 ################################
 #
 #
@@ -179,6 +198,9 @@ function auto_install() {
 #
 # 持行逻辑，以参数 $1 选择持行
 # 
+if [ "$#" == 3 ] && [ "$1" == "auto_install" ];then
+    lazy
+fi
 
 case $1 in
     readiness)

@@ -27,7 +27,7 @@ do
             expect eof
 EOF
 
-    ssh root@$ip "wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-vault-8.5.2111.repo"
-
+    scp roles/files/repo.tar root@$ip:/root
+    ssh root@$ip tar xf /root/repo.tar -C /etc/yum.repos.d/
 
 done

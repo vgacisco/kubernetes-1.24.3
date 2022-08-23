@@ -17,6 +17,7 @@
 #
 ####################################################################################
 
+workdir=`pwd`
 
 # ##############################    readiness   ###############################################
 #
@@ -179,14 +180,17 @@ function auto_install() {
 
 function lazy(){
 
-    ansible-playbook ./yaml_run/readiness.yaml
+    readiness
     
-    if ! sudo virsh list -all |grep $2;then
+    if ! sudo virsh list --all |grep "$2";then
         echo base virtual host not fond
     fi
+    
+    export base_system=$1
+    export passwd=$2
 
-    ./yaml_run/make_host.sh $2 $3
-    ./yaml_run/expect-host.sh $3
+    ./yaml_run/make_host.sh 
+    ./yaml_run/expect-host.sh 
     return 0
 
 }
@@ -199,7 +203,7 @@ function lazy(){
 # 持行逻辑，以参数 $1 选择持行
 # 
 if [ "$#" == 3 ] && [ "$1" == "auto_install" ];then
-    lazy
+    lazy $2 $3
 fi
 
 case $1 in

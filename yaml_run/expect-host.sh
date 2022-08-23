@@ -2,7 +2,7 @@
 
 #这个脚本 用来给hosts中的主机做免密登录
 
-passwd="$1"
+: ${passwd:="$1"}
 
 cat roles/files/hosts |grep -v "localhost" 
 

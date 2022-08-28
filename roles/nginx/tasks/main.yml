@@ -2,13 +2,25 @@
 # tasks file for roles/nginx
 #
 # 维护者: vgacisco
-# version: v1.0
+# version: v1.2
 # 8/10/22
+# 8/28/22 
 #
 - name: mkdir for nginx
   file:
     path: /root/nginx
     state: directory
+
+- name: install zlib-devel openssl-devel pcre-devel gcc make
+  yum:
+    name: '{{item}}'
+  loop:
+    - zlib-devel
+    - openssl-devel
+    - pcre-devel
+    - gcc
+    - make
+
 
 - name: pash tar file to server
   copy:

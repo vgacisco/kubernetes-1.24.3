@@ -1,8 +1,9 @@
 #! /bin/bash
 #
 #维护者: vgacisco
-# version: v1
+# version: v1.2
 # 8/10/22
+# 8/28/22
 
 ############################################################################
 #
@@ -19,7 +20,7 @@ tar xf $nginx_tarfile
 
 cd $nginx_dirfile
 
-yum install -y zlib-devel openssl-devel pcre-devel gcc make 
+# yum install -y zlib-devel openssl-devel pcre-devel gcc make 
 
 ./configure --prefix=/opt/nginx --with-stream
 

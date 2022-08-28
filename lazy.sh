@@ -162,8 +162,10 @@ function system() {
 
 ############################ print usage ####################
 function print_usage(){
+    echo " Usage: $0 "
     return 0
 }
+
 
 ############################ auto install ####################
 function auto_install() {
@@ -177,6 +179,11 @@ function auto_install() {
 #
 # 这个是懒人的函数 
 #
+# 这个函数会调用两个 sh文件，
+# 
+# make_host.sh 用来生成虚拟机并配置 网络，这里要求kvm 虚拟机并且 系统为centos8/redhat8 ，开启串口通信
+#
+# expect-host.sh 用来对虚拟机进行免密配置
 
 function lazy(){
 
@@ -200,8 +207,12 @@ function lazy(){
 #
 #
 #
-# 持行逻辑，以参数 $1 选择持行
+# 持行逻辑，以参数 $1 选择持行,如果有三个参数，并且 第一个参数 是 auto_install，就会调用 laxy函数。以 第二个参数 为模板生成虚拟机
+# 以 readiness 生成的 roles/files/hosts 为参数配置虚拟机的网络 ，
+# PS: 虚拟机模板请使用 centos8/redhat8 ,第三个参数 为模板虚拟机的root密码
 # 
+
+
 if [ "$#" == 3 ] && [ "$1" == "auto_install" ];then
     lazy $2 $3
 fi

@@ -34,7 +34,7 @@ elif [ "$1" == "stop" ];then
     
         host=$(echo $host_info |awk '{print $2}')
     
-        if ! sudo virsh list |grep "$host";then
+        if  sudo virsh list |grep "$host";then
             sudo virsh shutdown $host
         fi
     
